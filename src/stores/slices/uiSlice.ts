@@ -1,0 +1,118 @@
+/**
+ * UI Slice - Manages local UI state
+ *
+ * Purpose: Handle client-side UI state (modals, sidebars, themes, etc.)
+ * Use cases: Toggle visibility, manage UI preferences, control layout
+ */
+
+import type { StateCreator } from 'zustand'
+import i18n from '@/lib/i18n'
+
+export type Theme = 'light' | 'dark' | 'system'
+export type Language = 'en' | 'ko' | 'ja'
+
+export interface Modal {
+  isOpen: boolean
+  title?: string
+  content?: string
+}
+
+export interface UiSlice {
+  // State
+  isSidebarOpen: boolean
+  theme: Theme
+  language: Language
+  modal: Modal
+  notifications: Notification[]
+
+  // Actions
+  toggleSidebar: () => void
+  setSidebarOpen: (isOpen: boolean) => void
+  setTheme: (theme: Theme) => void
+  setLanguage: (language: Language) => void
+  openModal: (title: string, content: string) => void
+  closeModal: () => void
+  addNotification: (message: string, type?: 'info' | 'success' | 'warning' | 'error') => void
+  removeNotification: (id: number) => void
+  clearNotifications: () => void
+  reset: () => void
+}
+
+export interface Notification {
+  id: number
+  message: string
+  type: 'info' | 'success' | 'warning' | 'error'
+  timestamp: Date
+}
+
+const initialState = {
+  isSidebarOpen: false,
+  theme: 'system' as Theme,
+  language: 'en' as Language,
+  modal: { isOpen: false },
+  notifications: [],
+}
+
+export const createUiSlice: StateCreator<UiSlice> = (set) => ({
+  ...initialState,
+
+  toggleSidebar: () => {
+    set((state) => ({ isSidebarOpen: !state.isSidebarOpen }))
+  },
+
+  setSidebarOpen: (isOpen) => {
+    set({ isSidebarOpen: isOpen })
+  },
+
+  setTheme: (theme) => {
+    set({ theme })
+    // Note: DOM updates are handled by the ThemeProvider component
+    // to avoid side effects during render phase
+  },
+
+  setLanguage: (language) => {
+    set({ language })
+    // Update i18next language
+    i18n.changeLanguage(language)
+    document.documentElement.lang = language
+  },
+
+  openModal: (title, content) => {
+    set({ modal: { isOpen: true, title, content } })
+  },
+
+  closeModal: () => {
+    set({ modal: { isOpen: false } })
+  },
+
+  addNotification: (message, type = 'info') => {
+    const notification: Notification = {
+      id: Date.now(),
+      message,
+      type,
+      timestamp: new Date(),
+    }
+    set((state) => ({
+      notifications: [...state.notifications, notification]
+    }))
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      set((state) => ({
+        notifications: state.notifications.filter(n => n.id !== notification.id)
+      }))
+    }, 5000)
+  },
+
+  removeNotification: (id) => {
+    set((state) => ({
+      notifications: state.notifications.filter(n => n.id !== id)
+    }))
+  },
+
+  clearNotifications: () => {
+    set({ notifications: [] })
+  },
+
+  reset: () => set(initialState),
+})
