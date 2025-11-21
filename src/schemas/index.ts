@@ -17,6 +17,9 @@
 // Re-export all API schemas (primary use case)
 export * from './api'
 
+// Re-export mindmap schemas
+export * from './models/mindmap'
+
 // Backward compatibility aliases
 // These match the original src/mocks/schemas.ts exports
 

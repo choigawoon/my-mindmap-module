@@ -5,6 +5,7 @@
     "success": "成功",
     "cancel": "キャンセル",
     "save": "保存",
+    "saving": "保存中...",
     "delete": "削除",
     "edit": "編集",
     "create": "作成",
@@ -27,7 +28,8 @@
     "logout": "ログアウト",
     "login": "ログイン",
     "mswTest": "MSWテスト",
-    "zustandTest": "Zustandテスト"
+    "zustandTest": "Zustandテスト",
+    "mindmap": "マインドマップエディタ"
   },
   "pages": {
     "home": {
@@ -211,6 +213,24 @@
       "title": "ページが見つかりません",
       "description": "お探しのページは存在しません",
       "goHome": "ホームへ戻る"
+    },
+    "mindmap": {
+      "title": "マインドマップエディタ",
+      "untitled": "無題のマインドマップ",
+      "unsaved": "未保存",
+      "load": "読み込み",
+      "loadDocument": "ドキュメントを読み込む",
+      "noSavedDocuments": "保存されたドキュメントはありません",
+      "saved": "保存済み",
+      "export": "エクスポート",
+      "share": "共有",
+      "shareDocument": "ドキュメントを共有",
+      "shareDescription": "このURLをコピーして、マインドマップを他の人と共有してください",
+      "copied": "URLがクリップボードにコピーされました!",
+      "editor": "エディタ",
+      "preview": "プレビュー",
+      "editorPlaceholder": "マインドマップを入力してください...\n\nインデント（スペース2つ）で子ノードを作成します:\n\nルートノード\n  子1\n    孫1\n  子2",
+      "editorHint": "インデントレベルごとにスペース2つを使用してください"
     }
   },
   "messages": {
