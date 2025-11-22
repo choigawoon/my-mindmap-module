@@ -5,7 +5,7 @@
  * Supports save, load, and share functionality.
  */
 
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -42,23 +42,13 @@ import {
 } from '@/stores'
 import { db, type MindmapEntity } from '@/db'
 import { parseTextToTree } from '@/lib/mindmap-parser'
-import type { MindmapShare } from '@/schemas'
-
-// Route search params for sharing
-interface MindmapSearchParams {
-  data?: string
-}
 
 export const Route = createFileRoute('/mindmap')({
-  validateSearch: (search: Record<string, unknown>): MindmapSearchParams => ({
-    data: search.data as string | undefined,
-  }),
   component: MindmapEditor,
 })
 
 function MindmapEditor() {
   const { t } = useTranslation()
-  const search = useSearch({ from: '/mindmap' })
 
   const currentDocument = useCurrentMindmap()
   const parsedNodes = useParsedNodes()
@@ -103,24 +93,6 @@ function MindmapEditor() {
       console.error('Failed to load documents:', error)
     }
   }, [setSavedDocuments])
-
-  // Load shared data from URL on mount
-  useEffect(() => {
-    if (search.data) {
-      try {
-        const decoded = atob(search.data)
-        const shared: MindmapShare = JSON.parse(decoded)
-        setCurrentDocument({
-          title: shared.title,
-          content: shared.content,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-      } catch (error) {
-        console.error('Failed to parse shared data:', error)
-      }
-    }
-  }, [search.data, setCurrentDocument])
 
   // Load documents on mount
   useEffect(() => {
@@ -211,20 +183,26 @@ function MindmapEditor() {
     }
   }
 
-  // Generate share URL and embed code
+  // Generate share URL and embed code (ID-based)
   const handleShare = () => {
     if (!currentDocument) return
 
-    const shareData: MindmapShare = {
-      title: currentDocument.title,
-      content: currentDocument.content,
+    // Check if document is saved
+    if (!currentDocument.id) {
+      // Document needs to be saved first
+      setShareUrl('')
+      setEmbedCode('')
+      setIsShareDialogOpen(true)
+      setCopied(false)
+      setEmbedCopied(false)
+      return
     }
-    const encoded = btoa(JSON.stringify(shareData))
-    const url = `${window.location.origin}/mindmap?data=${encoded}`
-    const embedUrl = `${window.location.origin}/embed?data=${encoded}`
+
+    // Generate ID-based URLs
+    const embedUrl = `${window.location.origin}/embed?id=${currentDocument.id}`
     const iframe = `<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" style="border: 1px solid #e5e7eb; border-radius: 8px;"></iframe>`
 
-    setShareUrl(url)
+    setShareUrl(embedUrl)
     setEmbedCode(iframe)
     setIsShareDialogOpen(true)
     setCopied(false)
@@ -373,61 +351,71 @@ function MindmapEditor() {
               <DialogHeader>
                 <DialogTitle>{t('pages.mindmap.shareDocument')}</DialogTitle>
               </DialogHeader>
-              <div className="space-y-6">
-                {/* Share URL section */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">{t('pages.mindmap.shareUrl')}</h4>
-                  <p className="text-sm text-gray-600">
-                    {t('pages.mindmap.shareDescription')}
-                  </p>
-                  <div className="flex gap-2">
-                    <Input
-                      value={shareUrl}
-                      readOnly
-                      className="flex-1 text-xs"
-                    />
-                    <Button onClick={handleCopyUrl} size="sm">
-                      {copied ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                  {copied && (
-                    <p className="text-sm text-green-600">
-                      {t('pages.mindmap.copied')}
-                    </p>
-                  )}
+              {!currentDocument?.id ? (
+                <div className="py-4">
+                  <Alert>
+                    <AlertDescription>
+                      {t('pages.mindmap.saveFirst')}
+                    </AlertDescription>
+                  </Alert>
                 </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Embed URL section */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">{t('pages.mindmap.embedUrl')}</h4>
+                    <p className="text-sm text-gray-600">
+                      {t('pages.mindmap.shareDescription')}
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        value={shareUrl}
+                        readOnly
+                        className="flex-1 text-xs"
+                      />
+                      <Button onClick={handleCopyUrl} size="sm">
+                        {copied ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                    {copied && (
+                      <p className="text-sm text-green-600">
+                        {t('pages.mindmap.copied')}
+                      </p>
+                    )}
+                  </div>
 
-                {/* Embed code section */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">{t('pages.mindmap.embedCode')}</h4>
-                  <p className="text-sm text-gray-600">
-                    {t('pages.mindmap.embedDescription')}
-                  </p>
-                  <div className="flex gap-2">
-                    <textarea
-                      value={embedCode}
-                      readOnly
-                      className="flex-1 text-xs p-2 border rounded bg-gray-50 font-mono h-20 resize-none"
-                    />
-                    <Button onClick={handleCopyEmbed} size="sm" className="self-start">
-                      {embedCopied ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </div>
-                  {embedCopied && (
-                    <p className="text-sm text-green-600">
-                      {t('pages.mindmap.embedCopied')}
+                  {/* Embed code section */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">{t('pages.mindmap.embedCode')}</h4>
+                    <p className="text-sm text-gray-600">
+                      {t('pages.mindmap.embedDescription')}
                     </p>
-                  )}
+                    <div className="flex gap-2">
+                      <textarea
+                        value={embedCode}
+                        readOnly
+                        className="flex-1 text-xs p-2 border rounded bg-gray-50 font-mono h-20 resize-none"
+                      />
+                      <Button onClick={handleCopyEmbed} size="sm" className="self-start">
+                        {embedCopied ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </div>
+                    {embedCopied && (
+                      <p className="text-sm text-green-600">
+                        {t('pages.mindmap.embedCopied')}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </DialogContent>
           </Dialog>
         </div>

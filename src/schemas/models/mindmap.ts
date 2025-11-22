@@ -61,6 +61,19 @@ export const MindmapUpdateSchema = z.object({
 export type MindmapUpdate = z.infer<typeof MindmapUpdateSchema>
 
 // =============================================================================
+// List Response Schema
+// =============================================================================
+
+export const MindmapsListResponseSchema = z.object({
+  mindmaps: z.array(MindmapSchema),
+  total: z.number(),
+  skip: z.number(),
+  limit: z.number(),
+})
+
+export type MindmapsListResponse = z.infer<typeof MindmapsListResponseSchema>
+
+// =============================================================================
 // Share Schema (for URL encoding)
 // =============================================================================
 
