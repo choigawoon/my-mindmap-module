@@ -18,3 +18,6 @@ export * from './search'
 
 // Health
 export * from './health'
+
+// Mindmaps
+export * from './mindmaps'

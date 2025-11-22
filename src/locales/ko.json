@@ -225,19 +225,21 @@
       "export": "내보내기",
       "share": "공유",
       "shareDocument": "문서 공유",
-      "shareUrl": "공유 URL",
+      "embedUrl": "임베드 URL",
       "shareDescription": "이 URL을 복사하여 다른 사람과 마인드맵을 공유하세요",
       "copied": "URL이 클립보드에 복사되었습니다!",
       "embedCode": "임베드 코드",
       "embedDescription": "이 코드를 복사하여 웹사이트에 마인드맵을 삽입하세요",
       "embedCopied": "임베드 코드가 클립보드에 복사되었습니다!",
+      "saveFirst": "공유하기 전에 먼저 문서를 저장해주세요.",
       "editor": "에디터",
       "preview": "미리보기",
       "editorPlaceholder": "마인드맵을 입력하세요...\n\n들여쓰기(스페이스 2칸)로 하위 노드를 만듭니다:\n\n루트 노드\n  자식 1\n    손자 1\n  자식 2",
       "editorHint": "들여쓰기 레벨당 스페이스 2칸을 사용하세요"
     },
     "embed": {
-      "noData": "마인드맵 데이터가 제공되지 않았습니다",
+      "noData": "마인드맵 ID가 제공되지 않았습니다",
+      "notFound": "마인드맵을 찾을 수 없습니다",
       "parseError": "마인드맵 데이터를 불러오는데 실패했습니다",
       "poweredBy": "Mindmap Editor 제공"
     }

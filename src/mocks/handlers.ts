@@ -12,8 +12,13 @@ import {
   LoginResponseSchema,
   HealthCheckSchema,
   SearchResponseSchema,
+  MindmapSchema,
+  MindmapCreateSchema,
+  MindmapUpdateSchema,
+  MindmapsListResponseSchema,
   type Item,
   type User,
+  type Mindmap,
   type HealthCheck,
   type HTTPValidationError,
 } from '@/schemas'
@@ -383,5 +388,150 @@ export const handlers = [
     // Validate response with Zod
     const validated = SearchResponseSchema.parse(response)
     return HttpResponse.json(validated)
+  }),
+
+  // Mindmaps - List all mindmaps
+  http.get('/api/mindmaps', async ({ request }) => {
+    const url = new URL(request.url)
+    const skip = parseInt(url.searchParams.get('skip') || '0')
+    const limit = parseInt(url.searchParams.get('limit') || '100')
+
+    const mindmaps = await db.mindmaps.toArray()
+    const total = mindmaps.length
+    const paginatedMindmaps = mindmaps.slice(skip, skip + limit)
+
+    // Map to response format
+    const responseMindmaps: Mindmap[] = paginatedMindmaps.map((mindmap) => ({
+      id: mindmap.id!,
+      title: mindmap.title,
+      content: mindmap.content,
+      created_at: mindmap.created_at,
+      updated_at: mindmap.updated_at,
+    }))
+
+    const response = {
+      mindmaps: responseMindmaps,
+      total,
+      skip,
+      limit,
+    }
+
+    // Validate response with Zod
+    const validated = MindmapsListResponseSchema.parse(response)
+    return HttpResponse.json(validated)
+  }),
+
+  // Mindmaps - Get single mindmap
+  http.get('/api/mindmaps/:id', async ({ params }) => {
+    const { id } = params
+    const mindmap = await db.mindmaps.get(Number(id))
+
+    if (!mindmap) {
+      return httpErrorResponse('Mindmap not found', 404)
+    }
+
+    const responseMindmap: Mindmap = {
+      id: mindmap.id!,
+      title: mindmap.title,
+      content: mindmap.content,
+      created_at: mindmap.created_at,
+      updated_at: mindmap.updated_at,
+    }
+
+    // Validate response with Zod
+    const validated = MindmapSchema.parse(responseMindmap)
+    return HttpResponse.json(validated)
+  }),
+
+  // Mindmaps - Create new mindmap
+  http.post('/api/mindmaps', async ({ request }) => {
+    const body = await request.json()
+
+    // Validate request body with Zod
+    const result = MindmapCreateSchema.safeParse(body)
+
+    if (!result.success) {
+      return validationErrorResponse(result.error)
+    }
+
+    const validatedData = result.data
+    const now = new Date().toISOString()
+
+    // Add to IndexedDB
+    const id = (await db.mindmaps.add({
+      title: validatedData.title,
+      content: validatedData.content,
+      created_at: now,
+      updated_at: now,
+    })) as number
+
+    const newMindmap: Mindmap = {
+      id,
+      title: validatedData.title,
+      content: validatedData.content,
+      created_at: now,
+      updated_at: now,
+    }
+
+    // Validate response with Zod
+    const validated = MindmapSchema.parse(newMindmap)
+    return HttpResponse.json(validated, { status: 201 })
+  }),
+
+  // Mindmaps - Update mindmap
+  http.put('/api/mindmaps/:id', async ({ params, request }) => {
+    const { id } = params
+    const body = await request.json()
+
+    // Validate request body with Zod
+    const result = MindmapUpdateSchema.safeParse(body)
+
+    if (!result.success) {
+      return validationErrorResponse(result.error)
+    }
+
+    const validatedData = result.data
+    const mindmapId = Number(id)
+    const existingMindmap = await db.mindmaps.get(mindmapId)
+
+    if (!existingMindmap) {
+      return httpErrorResponse('Mindmap not found', 404)
+    }
+
+    const updatedMindmap = {
+      ...existingMindmap,
+      ...validatedData,
+      updated_at: new Date().toISOString(),
+    }
+
+    // Update in IndexedDB
+    await db.mindmaps.put(updatedMindmap)
+
+    const responseMindmap: Mindmap = {
+      id: updatedMindmap.id!,
+      title: updatedMindmap.title,
+      content: updatedMindmap.content,
+      created_at: updatedMindmap.created_at,
+      updated_at: updatedMindmap.updated_at,
+    }
+
+    // Validate response with Zod
+    const validated = MindmapSchema.parse(responseMindmap)
+    return HttpResponse.json(validated)
+  }),
+
+  // Mindmaps - Delete mindmap
+  http.delete('/api/mindmaps/:id', async ({ params }) => {
+    const { id } = params
+    const mindmapId = Number(id)
+    const existingMindmap = await db.mindmaps.get(mindmapId)
+
+    if (!existingMindmap) {
+      return httpErrorResponse('Mindmap not found', 404)
+    }
+
+    await db.mindmaps.delete(mindmapId)
+
+    return HttpResponse.json({ message: 'Mindmap deleted successfully' })
   }),
 ]
