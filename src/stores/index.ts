@@ -29,9 +29,10 @@ import { createApiSlice, type ApiSlice } from './slices/apiSlice'
 import { createUiSlice, type UiSlice } from './slices/uiSlice'
 import { createTaskSlice, type TaskSlice } from './slices/taskSlice'
 import { createWorkflowSlice, type WorkflowSlice } from './slices/workflowSlice'
+import { createMindmapSlice, type MindmapSlice } from './slices/mindmapSlice'
 
 // Combined store type
-export type Store = ApiSlice & UiSlice & TaskSlice & WorkflowSlice
+export type Store = ApiSlice & UiSlice & TaskSlice & WorkflowSlice & MindmapSlice
 
 /**
  * Main application store
@@ -47,6 +48,7 @@ export const useStore = create<Store>()(
         ...createUiSlice(...args),
         ...createTaskSlice(...args),
         ...createWorkflowSlice(...args),
+        ...createMindmapSlice(...args),
       }),
       {
         name: 'app-storage', // LocalStorage key
@@ -126,6 +128,13 @@ export const useWorkHistory = () => useStore(state => state.workHistory)
 export const useWorkLogs = () => useStore(state => state.workLogs)
 export const useIsWorkInProgress = () => useStore(state => state.isWorkInProgress)
 
+// Mindmap selectors
+export const useCurrentMindmap = () => useStore(state => state.currentDocument)
+export const useParsedNodes = () => useStore(state => state.parsedNodes)
+export const useSavedMindmaps = () => useStore(state => state.savedDocuments)
+export const useHasUnsavedChanges = () => useStore(state => state.hasUnsavedChanges)
+export const useParseError = () => useStore(state => state.parseError)
+
 /**
  * Action hooks for better organization
  * Group related actions together
@@ -180,6 +189,22 @@ export const useWorkflowActions = () => useStore(
   }))
 )
 
+export const useMindmapActions = () => useStore(
+  useShallow(state => ({
+    setCurrentDocument: state.setCurrentDocument,
+    updateContent: state.updateContent,
+    updateTitle: state.updateTitle,
+    setParsedNodes: state.setParsedNodes,
+    setParseError: state.setParseError,
+    setSavedDocuments: state.setSavedDocuments,
+    addSavedDocument: state.addSavedDocument,
+    updateSavedDocument: state.updateSavedDocument,
+    removeSavedDocument: state.removeSavedDocument,
+    newDocument: state.newDocument,
+    markSaved: state.markSaved,
+  }))
+)
+
 /**
  * Reset all stores (useful for logout)
  */
@@ -203,3 +228,4 @@ export type { User, Post } from './slices/apiSlice'
 export type { Theme, Language, Notification } from './slices/uiSlice'
 export type { Task } from './slices/taskSlice'
 export type { WorkItem, WorkLog, WorkStatus } from './slices/workflowSlice'
+export type { MindmapDocument } from './slices/mindmapSlice'

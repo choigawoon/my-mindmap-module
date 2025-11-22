@@ -5,6 +5,7 @@
     "success": "Success",
     "cancel": "Cancel",
     "save": "Save",
+    "saving": "Saving...",
     "delete": "Delete",
     "edit": "Edit",
     "create": "Create",
@@ -27,7 +28,8 @@
     "logout": "Logout",
     "login": "Login",
     "mswTest": "MSW Test",
-    "zustandTest": "Zustand Test"
+    "zustandTest": "Zustand Test",
+    "mindmap": "Mindmap Editor"
   },
   "pages": {
     "home": {
@@ -211,6 +213,24 @@
       "title": "Page Not Found",
       "description": "The page you are looking for does not exist",
       "goHome": "Go to Home"
+    },
+    "mindmap": {
+      "title": "Mindmap Editor",
+      "untitled": "Untitled Mindmap",
+      "unsaved": "Unsaved",
+      "load": "Load",
+      "loadDocument": "Load Document",
+      "noSavedDocuments": "No saved documents",
+      "saved": "Saved",
+      "export": "Export",
+      "share": "Share",
+      "shareDocument": "Share Document",
+      "shareDescription": "Copy this URL to share your mindmap with others",
+      "copied": "URL copied to clipboard!",
+      "editor": "Editor",
+      "preview": "Preview",
+      "editorPlaceholder": "Enter your mindmap here...\n\nUse indentation (2 spaces) to create child nodes:\n\nRoot Node\n  Child 1\n    Grandchild 1\n  Child 2",
+      "editorHint": "Use 2 spaces for each level of indentation"
     }
   },
   "messages": {

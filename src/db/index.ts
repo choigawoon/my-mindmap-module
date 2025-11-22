@@ -30,6 +30,14 @@ export interface UserEntity {
   created_at: string
 }
 
+export interface MindmapEntity {
+  id?: number
+  title: string
+  content: string
+  created_at: string
+  updated_at: string
+}
+
 // =============================================================================
 // Database Class
 // =============================================================================
@@ -37,6 +45,7 @@ export interface UserEntity {
 export class AppDatabase extends Dexie {
   items!: EntityTable<ItemEntity, 'id'>
   users!: EntityTable<UserEntity, 'id'>
+  mindmaps!: EntityTable<MindmapEntity, 'id'>
 
   constructor() {
     super('MermaidChartCloneDB')
@@ -44,6 +53,12 @@ export class AppDatabase extends Dexie {
     this.version(1).stores({
       items: '++id, name, category, created_at',
       users: '++id, email, username, created_at',
+    })
+
+    this.version(2).stores({
+      items: '++id, name, category, created_at',
+      users: '++id, email, username, created_at',
+      mindmaps: '++id, title, created_at, updated_at',
     })
   }
 }
@@ -102,6 +117,46 @@ const initialUsers: Omit<UserEntity, 'id'>[] = [
   },
 ]
 
+const initialMindmaps: Omit<MindmapEntity, 'id'>[] = [
+  {
+    title: 'Project Planning',
+    content: `Project Planning
+  Research
+    Market Analysis
+    Competitor Review
+  Development
+    Frontend
+      React Components
+      State Management
+    Backend
+      API Design
+      Database Schema
+  Launch
+    Marketing
+    User Feedback`,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+  },
+  {
+    title: 'Learning Path',
+    content: `Web Development
+  Frontend
+    HTML/CSS
+    JavaScript
+    React
+  Backend
+    Node.js
+    Database
+      SQL
+      NoSQL
+  DevOps
+    Docker
+    CI/CD`,
+    created_at: '2024-01-02T00:00:00Z',
+    updated_at: '2024-01-02T00:00:00Z',
+  },
+]
+
 // =============================================================================
 // Database Initialization
 // =============================================================================
@@ -125,6 +180,13 @@ export async function initializeDatabase(): Promise<void> {
       console.log('[IndexedDB] Seeded users table with initial data')
     }
 
+    // Check if mindmaps table is empty
+    const mindmapCount = await db.mindmaps.count()
+    if (mindmapCount === 0) {
+      await db.mindmaps.bulkAdd(initialMindmaps)
+      console.log('[IndexedDB] Seeded mindmaps table with initial data')
+    }
+
     console.log('[IndexedDB] Database initialized successfully')
   } catch (error) {
     console.error('[IndexedDB] Failed to initialize database:', error)
@@ -138,6 +200,7 @@ export async function initializeDatabase(): Promise<void> {
 export async function clearDatabase(): Promise<void> {
   await db.items.clear()
   await db.users.clear()
+  await db.mindmaps.clear()
   console.log('[IndexedDB] Database cleared')
 }
 
