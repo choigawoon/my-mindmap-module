@@ -83,7 +83,9 @@ function MindmapEditor() {
   const [isLoadDialogOpen, setIsLoadDialogOpen] = useState(false)
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
+  const [embedCode, setEmbedCode] = useState('')
   const [copied, setCopied] = useState(false)
+  const [embedCopied, setEmbedCopied] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   // Load saved documents from IndexedDB
@@ -209,7 +211,7 @@ function MindmapEditor() {
     }
   }
 
-  // Generate share URL
+  // Generate share URL and embed code
   const handleShare = () => {
     if (!currentDocument) return
 
@@ -219,9 +221,14 @@ function MindmapEditor() {
     }
     const encoded = btoa(JSON.stringify(shareData))
     const url = `${window.location.origin}/mindmap?data=${encoded}`
+    const embedUrl = `${window.location.origin}/embed?data=${encoded}`
+    const iframe = `<iframe src="${embedUrl}" width="100%" height="400" frameborder="0" style="border: 1px solid #e5e7eb; border-radius: 8px;"></iframe>`
+
     setShareUrl(url)
+    setEmbedCode(iframe)
     setIsShareDialogOpen(true)
     setCopied(false)
+    setEmbedCopied(false)
   }
 
   // Copy share URL
@@ -232,6 +239,17 @@ function MindmapEditor() {
       setTimeout(() => setCopied(false), 2000)
     } catch (error) {
       console.error('Failed to copy:', error)
+    }
+  }
+
+  // Copy embed code
+  const handleCopyEmbed = async () => {
+    try {
+      await navigator.clipboard.writeText(embedCode)
+      setEmbedCopied(true)
+      setTimeout(() => setEmbedCopied(false), 2000)
+    } catch (error) {
+      console.error('Failed to copy embed code:', error)
     }
   }
 
@@ -351,33 +369,64 @@ function MindmapEditor() {
                 {t('pages.mindmap.share')}
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-lg">
               <DialogHeader>
                 <DialogTitle>{t('pages.mindmap.shareDocument')}</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
-                <p className="text-sm text-gray-600">
-                  {t('pages.mindmap.shareDescription')}
-                </p>
-                <div className="flex gap-2">
-                  <Input
-                    value={shareUrl}
-                    readOnly
-                    className="flex-1 text-xs"
-                  />
-                  <Button onClick={handleCopyUrl} size="sm">
-                    {copied ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-                {copied && (
-                  <p className="text-sm text-green-600">
-                    {t('pages.mindmap.copied')}
+              <div className="space-y-6">
+                {/* Share URL section */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">{t('pages.mindmap.shareUrl')}</h4>
+                  <p className="text-sm text-gray-600">
+                    {t('pages.mindmap.shareDescription')}
                   </p>
-                )}
+                  <div className="flex gap-2">
+                    <Input
+                      value={shareUrl}
+                      readOnly
+                      className="flex-1 text-xs"
+                    />
+                    <Button onClick={handleCopyUrl} size="sm">
+                      {copied ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {copied && (
+                    <p className="text-sm text-green-600">
+                      {t('pages.mindmap.copied')}
+                    </p>
+                  )}
+                </div>
+
+                {/* Embed code section */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">{t('pages.mindmap.embedCode')}</h4>
+                  <p className="text-sm text-gray-600">
+                    {t('pages.mindmap.embedDescription')}
+                  </p>
+                  <div className="flex gap-2">
+                    <textarea
+                      value={embedCode}
+                      readOnly
+                      className="flex-1 text-xs p-2 border rounded bg-gray-50 font-mono h-20 resize-none"
+                    />
+                    <Button onClick={handleCopyEmbed} size="sm" className="self-start">
+                      {embedCopied ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {embedCopied && (
+                    <p className="text-sm text-green-600">
+                      {t('pages.mindmap.embedCopied')}
+                    </p>
+                  )}
+                </div>
               </div>
             </DialogContent>
           </Dialog>

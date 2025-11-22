@@ -225,12 +225,21 @@
       "export": "エクスポート",
       "share": "共有",
       "shareDocument": "ドキュメントを共有",
+      "shareUrl": "共有URL",
       "shareDescription": "このURLをコピーして、マインドマップを他の人と共有してください",
       "copied": "URLがクリップボードにコピーされました!",
+      "embedCode": "埋め込みコード",
+      "embedDescription": "このコードをコピーして、ウェブサイトにマインドマップを埋め込んでください",
+      "embedCopied": "埋め込みコードがクリップボードにコピーされました!",
       "editor": "エディタ",
       "preview": "プレビュー",
       "editorPlaceholder": "マインドマップを入力してください...\n\nインデント（スペース2つ）で子ノードを作成します:\n\nルートノード\n  子1\n    孫1\n  子2",
       "editorHint": "インデントレベルごとにスペース2つを使用してください"
+    },
+    "embed": {
+      "noData": "マインドマップデータが提供されていません",
+      "parseError": "マインドマップデータの読み込みに失敗しました",
+      "poweredBy": "Mindmap Editor 提供"
     }
   },
   "messages": {

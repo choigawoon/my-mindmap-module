@@ -225,12 +225,21 @@
       "export": "Export",
       "share": "Share",
       "shareDocument": "Share Document",
+      "shareUrl": "Share URL",
       "shareDescription": "Copy this URL to share your mindmap with others",
       "copied": "URL copied to clipboard!",
+      "embedCode": "Embed Code",
+      "embedDescription": "Copy this code to embed the mindmap in your website",
+      "embedCopied": "Embed code copied to clipboard!",
       "editor": "Editor",
       "preview": "Preview",
       "editorPlaceholder": "Enter your mindmap here...\n\nUse indentation (2 spaces) to create child nodes:\n\nRoot Node\n  Child 1\n    Grandchild 1\n  Child 2",
       "editorHint": "Use 2 spaces for each level of indentation"
+    },
+    "embed": {
+      "noData": "No mindmap data provided",
+      "parseError": "Failed to load mindmap data",
+      "poweredBy": "Powered by Mindmap Editor"
     }
   },
   "messages": {

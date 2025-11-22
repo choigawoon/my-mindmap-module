@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ZustandTestRouteImport } from './routes/zustand-test'
 import { Route as MswTestRouteImport } from './routes/msw-test'
 import { Route as MindmapRouteImport } from './routes/mindmap'
+import { Route as EmbedRouteImport } from './routes/embed'
 import { Route as IndexRouteImport } from './routes/index'
 
 const ZustandTestRoute = ZustandTestRouteImport.update({
@@ -29,6 +30,11 @@ const MindmapRoute = MindmapRouteImport.update({
   path: '/mindmap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmbedRoute = EmbedRouteImport.update({
+  id: '/embed',
+  path: '/embed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/embed': typeof EmbedRoute
   '/mindmap': typeof MindmapRoute
   '/msw-test': typeof MswTestRoute
   '/zustand-test': typeof ZustandTestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/embed': typeof EmbedRoute
   '/mindmap': typeof MindmapRoute
   '/msw-test': typeof MswTestRoute
   '/zustand-test': typeof ZustandTestRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/embed': typeof EmbedRoute
   '/mindmap': typeof MindmapRoute
   '/msw-test': typeof MswTestRoute
   '/zustand-test': typeof ZustandTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/mindmap' | '/msw-test' | '/zustand-test'
+  fullPaths: '/' | '/embed' | '/mindmap' | '/msw-test' | '/zustand-test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/mindmap' | '/msw-test' | '/zustand-test'
-  id: '__root__' | '/' | '/mindmap' | '/msw-test' | '/zustand-test'
+  to: '/' | '/embed' | '/mindmap' | '/msw-test' | '/zustand-test'
+  id: '__root__' | '/' | '/embed' | '/mindmap' | '/msw-test' | '/zustand-test'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmbedRoute: typeof EmbedRoute
   MindmapRoute: typeof MindmapRoute
   MswTestRoute: typeof MswTestRoute
   ZustandTestRoute: typeof ZustandTestRoute
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MindmapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/embed': {
+      id: '/embed'
+      path: '/embed'
+      fullPath: '/embed'
+      preLoaderRoute: typeof EmbedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmbedRoute: EmbedRoute,
   MindmapRoute: MindmapRoute,
   MswTestRoute: MswTestRoute,
   ZustandTestRoute: ZustandTestRoute,
